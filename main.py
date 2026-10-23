@@ -1,4 +1,5 @@
 import pygame
+import math
 
 pygame.init()
 
@@ -9,8 +10,9 @@ clock = pygame.time.Clock()
 
 car_x = 380
 car_y = 270
-car_velocity = pygame.Vector2(0, 0)
 car_acceleration = 80
+car_friction = 1.5
+car_velocity = pygame.Vector2(0, 0)
 
 running = True
 
@@ -40,6 +42,7 @@ while running:
         direction = direction.normalize()
 
     car_velocity += direction * car_acceleration * dt
+    car_velocity *= math.exp(-car_friction * dt)
     car_x += car_velocity.x * dt
     car_y += car_velocity.y * dt
 
