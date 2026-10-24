@@ -10,6 +10,9 @@ clock = pygame.time.Clock()
 
 car_x = 400
 car_y = 100
+car_start_x = 400
+car_start_y = 100
+car_start_angle = 0
 car_acceleration = 400
 car_friction = 1.0
 car_velocity = pygame.Vector2(0, 0)
@@ -84,7 +87,7 @@ while running:
         direction = direction.normalize()
 
     on_road = outer_track.collidepoint(car_x,car_y) and not inner_track.collidepoint(car_x,car_y)
-    
+
     if on_road:
         terrain_multiplier = 1.0
         car_friction = car_road_friction
@@ -104,6 +107,15 @@ while running:
     car_velocity = longitudinal_velocity + lateral_velocity * lateral_damping
     car_x += car_velocity.x * dt
     car_y += car_velocity.y * dt
+
+    on_road = outer_track.collidepoint(car_x,car_y) and not inner_track.collidepoint(car_x,car_y)
+
+    if not on_road:
+        car_x = car_start_x
+        car_y = car_start_y
+        car_angle = car_start_angle
+        car_velocity = pygame.Vector2(0, 0)
+        print("CRASH!")
 
     if on_road:
         car_surface.fill((255, 0, 0))
