@@ -20,6 +20,7 @@ car_turn_speed = 120
 car_max_speed = 200
 car_normal_grip = 5.0
 car_drift_grip = 0.5
+car_steering_reference_speed = 100
 
 running = True
 
@@ -32,12 +33,14 @@ while running:
 
     keys = pygame.key.get_pressed()
     direction = pygame.Vector2(0, 0)
+    speed = car_velocity.length()
+    steering_factor = min(speed / car_steering_reference_speed, 1.0)
 
     if keys[pygame.K_d]:
-        car_angle -= car_turn_speed * dt
+        car_angle -= car_turn_speed * dt * steering_factor
 
     if keys[pygame.K_a]:
-        car_angle += car_turn_speed * dt
+        car_angle += car_turn_speed * dt * steering_factor
 
     angle_rad = math.radians(car_angle)
     forward = pygame.Vector2(
