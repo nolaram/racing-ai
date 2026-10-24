@@ -22,6 +22,9 @@ car_normal_grip = 5.0
 car_drift_grip = 0.5
 car_steering_reference_speed = 100
 
+outer_track = pygame.Rect(50,50, 700, 500)
+innter_track = pygame.Rect(200, 150, 400, 300)
+
 running = True
 
 while running:
@@ -36,11 +39,27 @@ while running:
     speed = car_velocity.length()
     steering_factor = min(speed / car_steering_reference_speed, 1.0)
 
+    angle_rad = math.radians(car_angle)
+
+    forward_before_steering = pygame.Vector2(
+        -math.sin(angle_rad),
+        -math.cos(angle_rad)
+    )
+
+    signed_speed = car_velocity.dot(forward_before_steering)
+
+    if signed_speed > 0:
+        steering_direction *= 1
+    elif signed_speed < 0:
+        steering_direction = -1
+    else:
+        steering_direction = 0
+
     if keys[pygame.K_d]:
-        car_angle -= car_turn_speed * dt * steering_factor
+        car_angle -= car_turn_speed * dt * steering_factor * steering_direction
 
     if keys[pygame.K_a]:
-        car_angle += car_turn_speed * dt * steering_factor
+        car_angle += car_turn_speed * dt * steering_factor * steering_direction
 
     angle_rad = math.radians(car_angle)
     forward = pygame.Vector2(
@@ -75,7 +94,9 @@ while running:
     car_x += car_velocity.x * dt
     car_y += car_velocity.y * dt
 
-    screen.fill((0, 0, 0))
+    screen.fill((40, 110, 70))
+    pygame.draw.rect(screen, (90, 90, 90), outer_track)
+    pygame.draw.rect(screen, (40, 110, 70), innter_track)
     rotated_car = pygame.transform.rotate(car_surface, car_angle)
     rotated_rect = rotated_car.get_rect(center=(car_x, car_y))
     screen.blit(rotated_car, rotated_rect)
