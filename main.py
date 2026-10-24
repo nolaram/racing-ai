@@ -8,11 +8,15 @@ pygame.display.set_caption("Racing AI")
 
 clock = pygame.time.Clock()
 
-car_x = 380
-car_y = 270
+car_x = 400
+car_y = 300
 car_acceleration = 80
 car_friction = 1.5
 car_velocity = pygame.Vector2(0, 0)
+car_surface = pygame.Surface((40, 60), pygame.SRCALPHA)
+car_surface.fill((255, 0, 0))
+car_angle = 0
+car_turn_speed = 120
 
 running = True
 
@@ -27,10 +31,10 @@ while running:
     direction = pygame.Vector2(0, 0)
 
     if keys[pygame.K_d]:
-        direction.x += 1
+        car_angle -= car_turn_speed * dt
 
     if keys[pygame.K_a]:
-        direction.x -= 1
+        car_angle += car_turn_speed * dt
 
     if keys[pygame.K_w]:
         direction.y -= 1
@@ -47,7 +51,9 @@ while running:
     car_y += car_velocity.y * dt
 
     screen.fill((0, 0, 0))
-    pygame.draw.rect(screen, (255, 0, 0), (car_x, car_y, 40, 60))
+    rotated_car = pygame.transform.rotate(car_surface, car_angle)
+    rotated_rect = rotated_car.get_rect(center=(car_x, car_y))
+    screen.blit(rotated_car, rotated_rect)
     pygame.display.flip()
     
 pygame.quit()
