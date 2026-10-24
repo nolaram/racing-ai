@@ -9,7 +9,7 @@ pygame.display.set_caption("Racing AI")
 clock = pygame.time.Clock()
 
 car_x = 400
-car_y = 300
+car_y = 100
 car_acceleration = 400
 car_friction = 1.0
 car_velocity = pygame.Vector2(0, 0)
@@ -21,9 +21,11 @@ car_max_speed = 200
 car_normal_grip = 5.0
 car_drift_grip = 0.5
 car_steering_reference_speed = 100
+car_road_friction = 1.0
+car_grass_friction = 3.0
 
 outer_track = pygame.Rect(50,50, 700, 500)
-innter_track = pygame.Rect(200, 150, 400, 300)
+inner_track = pygame.Rect(200, 150, 400, 300)
 
 running = True
 
@@ -49,7 +51,7 @@ while running:
     signed_speed = car_velocity.dot(forward_before_steering)
 
     if signed_speed > 0:
-        steering_direction *= 1
+        steering_direction = 1
     elif signed_speed < 0:
         steering_direction = -1
     else:
@@ -81,7 +83,16 @@ while running:
     if direction.length() > 0:
         direction = direction.normalize()
 
-    car_velocity += direction * car_acceleration * dt
+    on_road = outer_track.collidepoint(car_x,car_y) and not inner_track.collidepoint(car_x,car_y)
+    
+    if on_road:
+        terrain_multiplier = 1.0
+        car_friction = car_road_friction
+    else:
+        terrain_multiplier = 0.4
+        car_friction = car_grass_friction
+
+    car_velocity += direction * car_acceleration * dt * terrain_multiplier
     car_velocity *= math.exp(-car_friction * dt)
     speed = car_velocity.length()
     if speed > car_max_speed:
@@ -94,9 +105,14 @@ while running:
     car_x += car_velocity.x * dt
     car_y += car_velocity.y * dt
 
+    if on_road:
+        car_surface.fill((255, 0, 0))
+    else:
+        car_surface.fill((255, 255, 0))
+
     screen.fill((40, 110, 70))
     pygame.draw.rect(screen, (90, 90, 90), outer_track)
-    pygame.draw.rect(screen, (40, 110, 70), innter_track)
+    pygame.draw.rect(screen, (40, 110, 70), inner_track)
     rotated_car = pygame.transform.rotate(car_surface, car_angle)
     rotated_rect = rotated_car.get_rect(center=(car_x, car_y))
     screen.blit(rotated_car, rotated_rect)
