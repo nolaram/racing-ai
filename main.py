@@ -42,6 +42,8 @@ checkpoints = [
     pygame.Rect(50, 270, 150, 60)
 ]
 was_inside_checkpoint = False
+current_checkpoint = 0
+laps_completed = 0
 
 running = True
 
@@ -142,6 +144,16 @@ while running:
         car_surface.fill((255, 0, 0))
     else:
         car_surface.fill((255, 255, 0))
+
+    target_checkpoint = checkpoints[current_checkpoint]
+    inside_target = target_checkpoint.collidepoint(car_x, car_y)
+    if inside_target:
+        print("Target checkpoint detected!")
+        current_checkpoint += 1
+        if current_checkpoint >= len(checkpoints):
+            laps_completed += 1
+            print(f"Lap completed! Laps: {laps_completed}")
+            current_checkpoint = 0
 
     # inside_checkpoint = checkpoint_1.collidepoint(car_x, car_y)
     # if inside_checkpoint and not was_inside_checkpoint and not checkpoint_1_completed:
