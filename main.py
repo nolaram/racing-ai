@@ -45,6 +45,8 @@ was_inside_checkpoint = False
 current_checkpoint = 0
 laps_completed = 0
 
+episode_reward = 0
+
 running = True
 
 while running:
@@ -139,6 +141,10 @@ while running:
         print(f"Episode Time: {episode_time:.2f} seconds")
         episode_time = 0.0
         print(f"Episode: {episode}")
+        episode_reward -= 20
+        print("You crashed! Final Reward:", episode_reward)
+        episode_reward = 0
+        current_checkpoint = 0
 
     if on_road:
         car_surface.fill((255, 0, 0))
@@ -150,8 +156,10 @@ while running:
     if inside_target:
         print("Target checkpoint detected!")
         current_checkpoint += 1
+        episode_reward += 10
         if current_checkpoint >= len(checkpoints):
             laps_completed += 1
+            episode_reward += 50
             print(f"Lap completed! Laps: {laps_completed}")
             current_checkpoint = 0
 
