@@ -30,10 +30,14 @@ car_grass_friction = 3.0
 outer_track = pygame.Rect(50,50, 700, 500)
 inner_track = pygame.Rect(200, 150, 400, 300)
 
+episode = 1
+episode_time = 0.0
+
 running = True
 
 while running:
     dt = clock.tick(60) / 1000.0
+    episode_time += dt
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -115,7 +119,8 @@ while running:
         car_y = car_start_y
         car_angle = car_start_angle
         car_velocity = pygame.Vector2(0, 0)
-        print("CRASH!")
+        episode += 1
+        print(f"Episode: {episode}")
 
     if on_road:
         car_surface.fill((255, 0, 0))
