@@ -8,9 +8,9 @@ pygame.display.set_caption("Racing AI")
 
 clock = pygame.time.Clock()
 
-car_x = 400
+car_x = 300
 car_y = 100
-car_start_x = 400
+car_start_x = 300
 car_start_y = 100
 car_start_angle = 0
 car_acceleration = 400
@@ -32,6 +32,16 @@ inner_track = pygame.Rect(200, 150, 400, 300)
 
 episode = 1
 episode_time = 0.0
+
+# checkpoint_1 = pygame.Rect(370, 50, 60, 100)
+# checkpoint_1_completed = False
+checkpoints = [
+    pygame.Rect(370, 50, 60, 100),
+    pygame.Rect(600, 270, 150, 60),
+    pygame.Rect(370, 450, 60, 100),
+    pygame.Rect(50, 270, 150, 60)
+]
+was_inside_checkpoint = False
 
 running = True
 
@@ -101,13 +111,17 @@ while running:
 
     car_velocity += direction * car_acceleration * dt * terrain_multiplier
     car_velocity *= math.exp(-car_friction * dt)
+    
     speed = car_velocity.length()
     if speed > car_max_speed:
         car_velocity = car_velocity.normalize() * car_max_speed
     forward_speed = car_velocity.dot(forward)
+
     longitudinal_velocity = forward * forward_speed
     lateral_velocity = car_velocity - longitudinal_velocity
+
     lateral_damping = math.exp(-car_lateral_grip * dt)
+
     car_velocity = longitudinal_velocity + lateral_velocity * lateral_damping
     car_x += car_velocity.x * dt
     car_y += car_velocity.y * dt
@@ -120,6 +134,8 @@ while running:
         car_angle = car_start_angle
         car_velocity = pygame.Vector2(0, 0)
         episode += 1
+        print(f"Episode Time: {episode_time:.2f} seconds")
+        episode_time = 0.0
         print(f"Episode: {episode}")
 
     if on_road:
@@ -127,9 +143,18 @@ while running:
     else:
         car_surface.fill((255, 255, 0))
 
+    # inside_checkpoint = checkpoint_1.collidepoint(car_x, car_y)
+    # if inside_checkpoint and not was_inside_checkpoint and not checkpoint_1_completed:
+    #     print("Checkpoint 1 reached!")
+    #     checkpoint_1_completed = True
+    # was_inside_checkpoint = inside_checkpoint
+
     screen.fill((40, 110, 70))
     pygame.draw.rect(screen, (90, 90, 90), outer_track)
     pygame.draw.rect(screen, (40, 110, 70), inner_track)
+    for checkpoint in checkpoints:
+        pygame.draw.rect(screen, (255, 215, 0), checkpoint, 2)
+
     rotated_car = pygame.transform.rotate(car_surface, car_angle)
     rotated_rect = rotated_car.get_rect(center=(car_x, car_y))
     screen.blit(rotated_car, rotated_rect)
